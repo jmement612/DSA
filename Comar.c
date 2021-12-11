@@ -1,233 +1,124 @@
-// Create a structure for student that contains the following:
-//     studID, studName, studScore
-
-// The name must be a structure also of a firstname, middlname, and lastname.
-// The student scores is an array of 5 scores. ( accepts values from 1.0 to 5.0)
-
-// Create an array of 5 students.
-
-// Create a function that will display a student information.
-// Create a function that will display all the students in the array. 
-// Create a function that will get the average score of a student.
-// Create a function that will encode the 5 scores of the student.
-
 #include<stdio.h>
-#include<string.h>
-
-#define MAX_SCORE 5
-#define MAX_STUDENT 5
-#define TRUE 1
-#define FALSE 0
+#include<stdlib.h>
+#include <conio.h>
 
 typedef char String[20];
-typedef int Boolean;
 
-typedef struct {
-    String fname;
-    String mname;
-    String lname;
-} Name;
+typedef struct n{
+    int whole;
+    int num;
+    int den;
+}Fraction;
 
-typedef struct {
-    int studID;
-    Name studName;
-    float studScore[MAX_SCORE];
-} Student;
+typedef struct node{
+	Fraction f;
+	struct node* next;
+}*List;
 
+void initList(List* L);
+Fraction initFraction(int a, int b);
+void insertFirst(List* L, Fraction newData);
+void insertLast(List* L, Fraction newData);
+void insertSorted(List* L, Fraction newData);
+void deleteList(List* L, Fraction newData);
 
-void displayStudent(Student s);
-void displayStudents(Student studs[], int n);
-float getScoreAverage(Student s);
-void recordScore(Student *s, float scores[], int n);
+void displayFraction(Fraction f);
+void displayList(List L);
 
-Name createName(String fname, String mname, String lname);
-Student createStudent(int id, Name name);
-
-Boolean insertFirst(Student list[], int *n, Student s);
-Boolean insertLast(Student list[], int *n, Student s);
-Student deleteFirst(Student list[], int *n);
-Student deleteLast(Student list[], int *n);
-int search(Student[], int n, int id);
-
-int getCount(Student list[]);
-
-int main() {
-    Student list[MAX_STUDENT];
-    int count = 0;
-    float s[5] = {3.0, 3.0, 3.0, 1.0, 5.0};
-
-
-    list[0] = createStudent(1001, createName("Kyle", "Castro", "Burce"));
-    list[1] = createStudent(1002, createName("Sugar", "Librero", "Vender")); //Camae mana mao na sugar
-    count = 2;
-    // list[2] = createStudent(1003, createName("Christoph", "Gwapo", "Carreon"));
-    // list[3] = createStudent(1004, createName("Gwapo", "Gibert", "Kaayo")); 
-    // list[4] = createStudent(1005, createName("Fitz", "Napulihan", "Martin")); 
-
-
-    recordScore(&list[3], s, 5);
-
-    printf("\n\nDisplay One Student:\n");
-    displayStudent(list[1]);
-
-    printf("\n\nDisplay All Student:\n");
-    displayStudents(list, 5);
-
-    return 0;
+int main(){
+	List L;
+	Fraction frac;
+	
+	initList(&L);
+	
+	frac = initFraction(1, 2);
+	insertFirst(&L, frac);
+	
+	frac = initFraction(3, 4);
+	insertFirst(&L, frac);
+	
+	frac = initFraction(2, 3);
+	insertFirst(&L, frac);
+	
+	displayList(L);
+	
+	return 0;
+	
 }
 
-void displayStudent(Student s) {
-    int i;
-
-    printf("%20s: %d\n", "Student ID", s.studID);
-    printf("%20s: %s, %s %c.\n", "Student Name", s.studName.lname, s.studName.fname, s.studName.mname[0]);
-    printf("%20s: {", "Scores");
-    for(i=0; i<MAX_SCORE; ++i) {
-        printf("%.2f", s.studScore[i]);
-        if(i < MAX_SCORE-1) {
-            printf(", ");
-        }
-    }
-    printf("}");
+void initList(List* L){
+	*L = NULL;
 }
 
-void displayStudents(Student studs[], int n) {
-    int i, j;
-    printf("%10s | %30s | %s\n", "ID", "NAME", "SCORE");
-    for(i=0; i<n; i++) {
-        printf("%10d | %14s %15s | {", studs[i].studID, studs[i].studName.fname, studs[i].studName.lname);
-        for(j=0; j<MAX_SCORE; ++j) {
-            printf("%.2f", studs[i].studScore[j]);
-            if(j < MAX_SCORE-1) {
-                printf(", ");
-            }
-        }
-        printf("}\n");
-    }
+Fraction initFraction(int a, int b){
+	Fraction t;
+	
+	t.num = a;
+	t.den = b;
+	t.whole = t.num/t.den;
+	
+	return t;
 }
 
-float getScoreAverage(Student s) {
-    float sum = 0;
-    int i;
-
-    for(i=0; i<MAX_SCORE; ++i) {
-        sum += s.studScore[i];
-    }
-
-    return sum/MAX_SCORE;
+void insertFirst(List* L, Fraction newData){
+	List temp;
+	
+	temp = (List)malloc(sizeof(struct node));
+	if(temp!=NULL){
+		temp->f = newData;
+		temp->next = *L;
+		*L = temp;
+	}
 }
 
-void recordScore(Student *s, float scores[], int n) {
-    memcpy(s->studScore, scores, sizeof(float)*n);
+//
+void insertLast(List* L, Fraction newData)
+{
+	List temp, *trav;
+	
+	temp = (List)malloc(sizeof(struct node));
+	
+	if(temp != NULL){
+		for(trav = L; *trav != NULL; trav = &(*trav)->next){}
+		temp->f = newData;
+		temp->next = *trav;
+		*trav = temp;
+	}
+		
 }
 
-Name createName(String fname, String mname, String lname) {
-    Name n;
-
-    strcpy(n.fname, fname);
-    strcpy(n.mname, mname);
-    strcpy(n.lname, lname);
-
-    return n;
+void insertSorted(List* L, Fraction newData)
+{
+	List temp, *trav;
+	
+	temp = (List)malloc(sizeof(struct node));
+	
+	if(temp != NULL){
+		for(trav = L; *trav != NULL && (*trav)->f.whole < newData.whole; trav = &(*trav)->next){}
+		temp->f = newData;
+		temp->next = *trav;
+		*trav = temp;
+	}
 }
 
-Student createStudent(int id, Name name) {
-    Student s = {id, name, {5.0, 5.0, 5.0, 5.0, 5.0}}; 
-
-    return s;
+void deleteList(List* L, Fraction newData)
+{
+	List temp, *trav;
+	
+	for(trav = L; *trav != NULL && (*trav)->f.whole != newData.whole; trav = &(*trav)->next){}
+	if(*trav != NULL){
+		temp = *trav;
+		*trav = temp->next;
+		free(temp);
+	}
 }
 
-Boolean insertFirst(Student list[], int *n, Student s){
-    int i;
+void displayFraction(Fraction f){
+	printf("%d/%d", f.num, f.den);
+}
 
-    if ( n >= MAX_STUDENT ){
-        return FALSE;
-    } else {
-
-        for( i = n; i <= 0; i-- ){
-            list[i + 1] = list[i];
-        }
-
-        &list[0] = s;
-        (n*)++;
-        
-        return TRUE;
+void displayList(List L){
+	for(; L != NULL; L = L->next) {
+        printf("%d/%d -> ", L->f.num, L->f.den);
     }
 }
-
-Boolean insertLast(Student list[], int *n, Student s){
-    int i;
-
-    if ( n >= MAX_STUDENT ){
-        return FALSE;
-    } else {
-        &list[(n*) + 1] = s;
-        (n*) = n + 1;
-        
-        return TRUE;
-    }
-}
-
-Student deleteFirst(Student list[], int *n){
-    int i; 
-    Student r;
-
-    r = list[0];
-    list[0].studID = 0;
-    list[0].studName = {'', '', ''} ;
-    list[0].studScore = {'5.0', '5.0', '5.0', '5.0', '5.0'};
-    (*n)--;
-
-    for(i = 0; i < n; i++){
-        list[i] = list[i + 1];
-    }
-
-    return r;
-}
-
-Student deleteLast(Student list[], int *n){
-    int i; 
-    Student r;
-
-    r = list[*n];
-    list[*n].studID = 0;
-    list[*n].studName = {'', '', ''} ;
-    list[*n].studScore = {'5.0', '5.0', '5.0', '5.0', '5.0'};
-    
-    (*n)--;
-
-    return r;
-}
-
-int search(Student[], int n, int id){
-    int i;
-
-    for(i = 0; i < n; i++){
-        if(Student[i].studID == id){
-            return i;
-        }else{
-            return -1;   
-        }
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

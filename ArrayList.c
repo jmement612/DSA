@@ -42,6 +42,7 @@ void recordScore(Student *s, float scores[], int n);
 Name createName(String fname, String mname, String lname);
 Student createStudent(int id, Name name);
 StudentList createStudentList();
+StudentDynamicList createStudentDL(int size);
 
 void displayName(Name n);
 void displayAllNames(Name *nList);
@@ -59,7 +60,7 @@ StudentList searchStudent(StudentDynamicList *list, String keyword);
 Name *getNamesPassed(Student list[], int n);
 StudentList getStudentPassed(StudentList list); //
 // e copy nalang ninyo daan then paste sa DEVC
-int main()S
+int main() {
     StudentList list = createStudentList();
 
     float s1[5] = {5.0, 5.0, 5.0, 1.0, 5.0};
@@ -263,59 +264,57 @@ StudentList getStudentPassed(StudentList list) {
     return passed;
 }
 
-Boolean insertSorted(StudentDynamicList *list, Student s){
-    int ctr, ctr2;
-    for(ctr=0;ctr<list->count;ctr++){
-        if(strcmp(list->studList[ctr]->studName->lname, s->studName->lname)>0){
-            for(ctr2=list->count;ctr>ctr2;ctr2--){
-                list->studList[ctr2]=list->studList[ctr2-1];
-            }
-            list->studList[ctr]=s;
-            list->count++;
-            return TRUE;
+Boolean insertSorted(StudentDynamicList *list, Student s) {
+    if(list->count >= list->max) {
+        list->max *= 2;
+        list->studList = realloc(list->studList, sizeof(Student)*list->max);
+        if(list->studList == NULL) {
+            return FALSE;
         }
     }
-    list->studList[list->count]=s;
+
+    for(i=list->count; i>0 && strcmp(list->studList[i-1].studName.lname, s.studName.lname)>0; --i) {
+        list->studList[i] = list->studList[i-1];
+    }
+    list->studList[i] = s;
     list->count++;
+
     return TRUE;
-} 
-StudentList searchStudent(StudentDynamicList *list, String keyword){ 
-    int ctr;
-    StudentList new = createStudentList();
-    for(ctr=0;ctr<list->count;ctr++){
-        if(strstr(list->studList[ctr]->studName->lname,keyword)!=NULL){ 
-            insertLast(&new, list->studlist[ctr]); 
+}
+
+
+StudentDynamicList searchStudent(StudentDynamicList *list, String keyword) {
+    StudentDynamicList result = createStudentDL(5);
+    int i;
+
+    for(i=0; i<list->count; ++i) {
+        if(strstr(list->studList[i].studName.lname, keyword)!=NULL) {
+            insertSorted(&result, list->studList[i]);
         }
     }
-    return new;
+
+    return result;
 }
-// 
-// 
-//
-/*====================Chat==========================*\
 
-/*==================================================*\
-Somebody once told me the world is gonna roll me
-I ain't the sharpest tool in the shed
+StudentDynamicList searchStudent(StudentDynamicList *list, String keyword) {
+    StudentDynamicList result = createStudentDL(5);
+    int i;
 
+    for(i=0; i<list->count; ++i) {
+        if(strstr(list->studList[i].studName.lname, keyword)!=NULL) {
+            if(result->count >= result->max) {
+                result->max *= 2;
+                result->studList = realloc(result->studList, sizeof(Student)*result->max);
+                if(result->studList == NULL) {
+                    break;
+                }
+            }
+            result->studList[result->count++] = list->studList[i];
+        }
+    }
 
-⢀⡴⠑⡄⠀⠀⠀⠀⠀⠀⠀⣀⣀⣤⣤⣤⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
-⠸⡇⠀⠿⡀⠀⠀⠀⣀⡴⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
-⠀⠀⠀⠀⠑⢄⣠⠾⠁⣀⣄⡈⠙⣿⣿⣿⣿⣿⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀ 
-⠀⠀⠀⠀⢀⡀⠁⠀⠀⠈⠙⠛⠂⠈⣿⣿⣿⣿⣿⠿⡿⢿⣆⠀⠀⠀⠀⠀⠀⠀ 
-⠀⠀⠀⢀⡾⣁⣀⠀⠴⠂⠙⣗⡀⠀⢻⣿⣿⠭⢤⣴⣦⣤⣹⠀⠀⠀⢀⢴⣶⣆ 
-⠀⠀⢀⣾⣿⣿⣿⣷⣮⣽⣾⣿⣥⣴⣿⣿⡿⢂⠔⢚⡿⢿⣿⣦⣴⣾⠁⠸⣼⡿ 
-⠀⢀⡞⠁⠙⠻⠿⠟⠉⠀⠛⢹⣿⣿⣿⣿⣿⣌⢤⣼⣿⣾⣿⡟⠉⠀⠀⠀⠀⠀ 
-⠀⣾⣷⣶⠇⠀⠀⣤⣄⣀⡀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀ 
-⠀⠉⠈⠉⠀⠀⢦⡈⢻⣿⣿⣿⣶⣶⣶⣶⣤⣽⡹⣿⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀ 
-⠀⠀⠀⠀⠀⠀⠀⠉⠲⣽⡻⢿⣿⣿⣿⣿⣿⣿⣷⣜⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀ 
-⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣷⣶⣮⣭⣽⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀ 
-⠀⠀⠀⠀⠀⠀⣀⣀⣈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀ 
-⠀⠀⠀⠀⠀⠀⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀ 
-⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠻⠿⠿⠿⠿⠛⠉
-
-/*==================================================*\
+    return result;
+}
 
 
 
@@ -331,4 +330,19 @@ I ain't the sharpest tool in the shed
 
 
 
-*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

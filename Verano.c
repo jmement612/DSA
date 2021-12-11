@@ -1,218 +1,206 @@
-// Create a structure for student that contains the following:
-//     studID, studName, studScore
-
-// The name must be a structure also of a firstname, middlname, and lastname.
-// The student scores is an array of 5 scores. ( accepts values from 1.0 to 5.0)
-
-// Create an array of 5 students.
-
-// Create a function that will display a student information.
-// Create a function that will display all the students in the array. 
-// Create a function that will get the average score of a student.
-// Create a function that will encode the 5 scores of the student.
-
-#include<stdio.h>
-#include<string.h>
-
-#define MAX_SCORE 5
-#define MAX_STUDENT 5
-#define TRUE 1
-#define FALSE 0
+#include <stdio.h>
 
 typedef char String[20];
-typedef int Boolean;
 
 typedef struct {
-    String fname;
-    String mname;
-    String lname;
-} Name;
+    int whole;
+    int num;
+    int den;
+} Fraction;
 
 typedef struct {
-    int studID;
-    Name studName;
-    float studScore[MAX_SCORE];
-} Student;
+    Fraction *fracs;
+    int count;
+    int max;
+} FracCollection;
 
+Fraction newFraction(int num, int den);
+Fraction inputFraction(String msg);
 
-void displayStudent(Student s);
-void displayStudents(Student studs[], int n);
-float getScoreAverage(Student s);
-void recordScore(Student *s, float scores[], int n);
+void displayFraction(Fraction f);
 
-Name createName(String fname, String mname, String lname);
-Student createStudent(int id, Name name);
+Fraction addFraction(Fraction a, Fraction b);
+Fraction subtractFraction(Fraction a, Fraction b);
+Fraction multiplyFraction(Fraction a, Fraction b);
+Fraction divideFraction(Fraction a, Fraction b);
 
-Boolean insertFirst(Student list[], int *n, Student s);
-Boolean insertLast(Student list[], int *n, Student s);
-Student deleteFirst(Student list[], int *n);
-Student deleteLast(Student list[], int *n);
-int search(Student[], int n, int id);
+Fraction simplyFraction(Fraction f);
+int fracGCD(Fraction a, Fraction b);
+Fraction addAllFractions(FracCollection fracs); 
 
 int main() {
-    Student list[MAX_STUDENT];
-    int count = 0;
-    float s[5] = {3.0, 3.0, 3.0, 1.0, 5.0};
+    String menu[5] = {"Add", "Subtract", "Multiply", "Divide", "EXIT"};
+    int i;
+    int choice;
+    Fraction x, y, z, w;
 
+    do {
+        printf("\n\nFRACTION CALCULATOR\n");
+        for(i=0; i<5; ++i) {
+            printf("[%d.] %s\n", i+1, menu[i]);
+        }
+        printf("\nEnter your choice: ");
+        scanf("%d", &choice);
 
-    list[0] = createStudent(1001, createName("Kyle", "Castro", "Burce"));
-    list[1] = createStudent(1002, createName("Sugar", "Librero", "Vender")); //Camae mana mao na sugar
-    count = 2;
-    // list[2] = createStudent(1003, createName("Christoph", "Gwapo", "Carreon"));
-    // list[3] = createStudent(1004, createName("Gwapo", "Gibert", "Kaayo")); 
-    // list[4] = createStudent(1005, createName("Fitz", "Napulihan", "Martin")); 
+        switch(choice) {
+            case 1:
+                printf("Adding two fractions...\n");
+                x = inputFraction("Enter fraction 1: ");
+                y = inputFraction("Enter fraction 2: ");
+                z = addFraction(x, y);
+               	// w = simplify(z);
+                displayFraction(x);
+                printf(" + ");
+                displayFraction(y);
+                printf(" = ");
+                displayFraction(z);
+                // printf(" = ");
+                // displayFraction(w);
+                break;
+            case 2:
+            	printf("Subtracting two fractions..\n");
+            	x = inputFraction("Enter fraction 1: ");
+            	y = inputFraction("Enter fraction 2: ");
+            	z = subtractFraction(x, y);
+            	displayFraction(x);
+            	printf("-");
+            	displayFraction(y);
+                printf(" = ");
+                displayFraction(z);
+                break;
+            case 3:
+            	printf("Multiplying two fractions..\n");
+            	x = inputFraction("Enter fraction 1: ");
+            	y = inputFraction("Enter fraction 2: ");
+            	z = multiplyFraction(x, y);
+            	displayFraction(x);
+            	printf("x");
+            	displayFraction(y);
+                printf(" = ");
+                displayFraction(z);
+                break;
+            case 4:
+            	printf("Dividing two fractions..\n");
+            	x = inputFraction("Enter fraction 1: ");
+            	y = inputFraction("Enter fraction 2: ");
+            	z = divideFraction(x, y);
+            	displayFraction(x);
+            	printf("/");
+            	displayFraction(y);
+                printf(" = ");
+                displayFraction(z);
+                break;
+            case 5:
+            	printf("Thank you!!!");
+                break;
+            default:
+                printf("Invalid Input");
+        }
 
+    } while(choice != 5);
 
-    recordScore(&list[3], s, 5);
+    
+    
 
-    printf("\n\nDisplay One Student:\n");
-    displayStudent(list[1]);
-
-    printf("\n\nDisplay All Student:\n");
-    displayStudents(list, 5);
 
     return 0;
 }
 
-void displayStudent(Student s) {
-    int i;
+Fraction newFraction(int num, int den) {
+    Fraction f = {0, num, den};
 
-    printf("%20s: %d\n", "Student ID", s.studID);
-    printf("%20s: %s, %s %c.\n", "Student Name", s.studName.lname, s.studName.fname, s.studName.mname[0]);
-    printf("%20s: {", "Scores");
-    for(i=0; i<MAX_SCORE; ++i) {
-        printf("%.2f", s.studScore[i]);
-        if(i < MAX_SCORE-1) {
-            printf(", ");
-        }
-    }
-    printf("}");
+    return f;
+} 
+
+Fraction inputFraction(String msg) {
+    Fraction f;
+
+    printf("%s: ", msg);
+    scanf("%d/%d", &f.num, &f.den);
+
+    return f;
 }
 
-void displayStudents(Student studs[], int n) {
-    int i, j;
-    printf("%10s | %30s | %s\n", "ID", "NAME", "SCORE");
-    for(i=0; i<n; i++) {
-        printf("%10d | %14s %15s | {", studs[i].studID, studs[i].studName.fname, studs[i].studName.lname);
-        for(j=0; j<MAX_SCORE; ++j) {
-            printf("%.2f", studs[i].studScore[j]);
-            if(j < MAX_SCORE-1) {
-                printf(", ");
-            }
-        }
-        printf("}\n");
-    }
+void displayFraction(Fraction f) {
+    printf("%d/%d", f.num, f.den);
 }
 
-float getScoreAverage(Student s) {
-    float sum = 0;
-    int i;
+Fraction addFraction(Fraction a, Fraction b) {
+    Fraction result;
 
-    for(i=0; i<MAX_SCORE; ++i) {
-        sum += s.studScore[i];
-    }
-
-    return sum/MAX_SCORE;
+    result.den = a.den * b.den;
+    result.num = (a.num * b.den) + (b.num * a.den); 
+    
+    return result;
 }
 
-void recordScore(Student *s, float scores[], int n) {
-    memcpy(s->studScore, scores, sizeof(float)*n);
+Fraction subtractFraction(Fraction a, Fraction b) {
+    Fraction result;
+
+    result.num = (a.num * b.den) - (b.num * a.num);
+    result.den = a.den*b.den; 
+    
+    return result;
 }
 
-Name createName(String fname, String mname, String lname) {
-    Name n;
+Fraction multiplyFraction(Fraction a, Fraction b)
+{
+	Fraction result;
 
-    strcpy(n.fname, fname);
-    strcpy(n.mname, mname);
-    strcpy(n.lname, lname);
-
-    return n;
+    result.num = a.num*b.num;
+    result.den = a.den*b.den; 
+    
+    return result;
 }
 
-Student createStudent(int id, Name name) {
-    Student s = {id, name, {5.0, 5.0, 5.0, 5.0, 5.0}}; 
+Fraction divideFraction(Fraction a, Fraction b)
+{
+	Fraction result;
 
-    return s;
+    result.num = a.num*b.den;
+    result.den = a.den*b.num; 
+    
+    return result;
 }
 
-Boolean insertFirst(Student list[], int *n, Student s){
-	int i, ret;//ret int not boolean
-	for(i=0;i<MAX_STUDENT;){
-		if(n!=MAX_STUDENT){
-			list[i++];
-			ret = 0;
-	    }else{
-			list[i] = s;
-			n++;
-			ret = 1;
-		}
-		return ret;
-	}
-}
-
-Boolean insertLast(Student list[], int *n, Student s){
-	int i;
-	Boolean ret;
-	for(i=*n-1;i<MAX_STUDENT-1;i--){
-		list[i] = s;
-		(*n)++;
-		ret = TRUE;
-	}
+Fraction simplify(Fraction a, Fraction b)
+{
+	Fraction ret;
+	int temp = fracGCD(a, b); // ????
+	ret.num = ret.num/temp; // ???
+	ret.den = ret.den/temp; // ???
+	
 	return ret;	
 }
 
-// Boolean insertFirst(Student list[], int *n, Student s){
-// 	int i;
-// 	Boolean ret;
-// 	for(i=0;i<MAX_STUDENT;i++){
-// 		if(list[0] == NULL){
-// 			list[0] = s;
-// 			list[i++];
-// 			ret = TRUE;
-// 		}else if(n >= MAX_STUDENT){
-// 		ret = FALSE;
-// 		}
-// 	}
-// 	n++;
-// 	return ret;	
-// }
+int fracGCD(Fraction a, Fraction b)
+{
+	int gcd,i;
+	for(i=1;i<=a.den&&i<=b.den;i++){
+		if(a.den%i==0&&b.den%i){
+			gcd=i;
+		}
+		return gcd;
+	}
+}
+//murag kuan na swa ang numerator og denom kuhaon ang gcd
 
-// Boolean insertLast(Student list[], int *n, Student s){
-// 	int i;
-// 	Boolean ret;
-// 	for ( i = 0; i < MAX_STUDENT; i++)
-// 	{
-// 		if(*n < MAX_STUDENT){
-// 			list[i] = s;
-// 			(*n)++;
-// 			ret = TRUE
-// 		}else{
-// 			ret = FALSE;
-// 		}
-// 	}
-// 	return ret;
-	
-// }
+// Fraction subtractFraction(Fraction a, Fraction b);
+// Fraction multiplyFraction(Fraction a, Fraction b);
+// Fraction divideFraction(Fraction a, Fraction b);
 
+// Fraction simplyFraction(Fraction f);
 
+Fraction addAllFractions(FracCollection fracs) {
+    Fraction result = newFraction(0,1);
+    int i;
 
+    for(i=0; i<fracs.count; ++i) {
+        result = addFraction(result, fracs.fracs[i]); 
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return result;
+}
 
 
 
